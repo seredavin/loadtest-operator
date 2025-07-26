@@ -286,9 +286,11 @@ spec:
   statusUpdateTimeout: 2
 `
 			file := filepath.Join(os.TempDir(), "e2e-auto-worker.yaml")
-			os.WriteFile(file, []byte(manifest), 0644)
+			err := os.WriteFile(file, []byte(manifest), 0644)
+			Expect(err).NotTo(HaveOccurred())
+
 			cmd := exec.Command("kubectl", "apply", "-f", file)
-			_, err := utils.Run(cmd)
+			_, err = utils.Run(cmd)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Waiting for status update")
@@ -325,9 +327,11 @@ spec:
   statusUpdateTimeout: 2
 `
 			file := filepath.Join(os.TempDir(), "e2e-manual-worker.yaml")
-			os.WriteFile(file, []byte(manifest), 0644)
+			err := os.WriteFile(file, []byte(manifest), 0644)
+			Expect(err).NotTo(HaveOccurred())
+
 			cmd := exec.Command("kubectl", "apply", "-f", file)
-			_, err := utils.Run(cmd)
+			_, err = utils.Run(cmd)
 			Expect(err).NotTo(HaveOccurred())
 
 			By("Checking that status is not updated")

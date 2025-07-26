@@ -68,28 +68,23 @@ func (r *LoadWorkerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	}
 
 	// Параллельное обновление статуса
-	tasks := spec.MaxConcurrent
-	if tasks < 1 {
-		tasks = 1
+	if spec.MaxConcurrent < 1 {
+		spec.MaxConcurrent = 1
 	}
-	updateFreq := spec.UpdateFrequency
-	if updateFreq < 1 {
-		updateFreq = 1000
+	if spec.UpdateFrequency < 1 {
+		spec.UpdateFrequency = 1000
 	}
 
 	// Пример: обновим статус ChildCount раз с заданной частотой
 	for i := 0; i < spec.ChildCount; i++ {
-		go func(idx int) {
+		go func() {
 			// Можно добавить поля в статус, например, PayloadHash или Progress
-			// status := worker.Status
-			// status.Progress = float32(idx+1) / float32(spec.ChildCount)
-			// status.PayloadHash = fmt.Sprintf("%x", sha256.Sum256(payload))
 			err := r.Status().Update(ctx, &worker)
 			if err != nil {
 				log.Error(err, "failed to update status")
 			}
-		}(i)
-		time.Sleep(time.Duration(updateFreq) * time.Millisecond)
+		}()
+		time.Sleep(time.Duration(spec.UpdateFrequency) * time.Millisecond)
 	}
 
 	return ctrl.Result{RequeueAfter: time.Duration(spec.StatusUpdateTimeout) * time.Second}, nil

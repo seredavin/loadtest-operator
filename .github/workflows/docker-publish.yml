@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'Dockerfile'
       - 'cmd/**'
@@ -12,7 +12,7 @@ on:
       - 'go.sum'
       - '.github/workflows/docker-publish.yml'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build-and-push:
@@ -47,4 +47,3 @@ jobs:
           tags: |
             docker.io/seredavin/loadtest-operator:latest
             docker.io/seredavin/loadtest-operator:${{ steps.vars.outputs.version }}
-
