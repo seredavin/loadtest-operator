@@ -133,3 +133,65 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+# Loadtest Operator
+
+## Быстрый старт для пользователя
+
+### 1. Установка CRD
+
+```
+kubectl apply -f config/crd/bases/
+```
+
+### 2. Установка cert-manager (если требуется)
+
+```
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml
+```
+
+### 3. Деплой оператора в кластер
+
+- Если используете опубликованный образ из DockerHub:
+
+```
+make deploy IMG=seredavin/loadtest-operator:latest
+```
+
+- Или вручную:
+
+```
+cd config/manager
+kustomize edit set image controller=seredavin/loadtest-operator:latest
+kubectl apply -k ../default
+```
+
+### 4. Проверка запуска
+
+```
+# Найти namespace, где запущен оператор
+kubectl get pods --all-namespaces | grep controller-manager
+
+# Посмотреть логи (замените <namespace> и <имя-pod> на актуальные)
+kubectl logs -n <namespace> <имя-pod>
+```
+
+### 5. Применение примеров CR
+
+```
+kubectl apply -f config/samples/loadtest_v1_loadworker.yaml
+kubectl apply -f config/samples/loadtest_v1_loadmanager.yaml
+```
+
+### 6. Удаление оператора
+
+```
+make undeploy
+```
+
+---
+
+**Примечания:**
+- Перед деплоем убедитесь, что образ seredavin/loadtest-operator:latest актуален и опубликован в DockerHub.
+- Namespace по умолчанию: `system`.
+- Для работы с kustomize используйте версию, совместимую с Kubernetes 1.22+.
+- Для e2e и unit тестов используйте `make test` и `make test-e2e`.
