@@ -16,7 +16,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: [self-hosted, nuk]
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
