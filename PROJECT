@@ -10,4 +10,14 @@ plugins:
   scorecard.sdk.operatorframework.io/v2: {}
 projectName: loadtest-operator
 repo: github.com/seredavin/loadtest-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: gitopscd.ru
+  group: loadtest
+  kind: LoadManager
+  path: github.com/seredavin/loadtest-operator/api/v1
+  version: v1
 version: "3"
