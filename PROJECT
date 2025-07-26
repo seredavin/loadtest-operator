@@ -20,4 +20,13 @@ resources:
   kind: LoadManager
   path: github.com/seredavin/loadtest-operator/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: gitopscd.ru
+  group: loadtest
+  kind: LoadWorker
+  path: github.com/seredavin/loadtest-operator/api/v1
+  version: v1
 version: "3"

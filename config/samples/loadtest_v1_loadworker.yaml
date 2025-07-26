@@ -1,0 +1,9 @@
+apiVersion: loadtest.gitopscd.ru/v1
+kind: LoadWorker
+metadata:
+  labels:
+    app.kubernetes.io/name: loadtest-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: loadworker-sample
+spec:
+  # TODO(user): Add fields here
