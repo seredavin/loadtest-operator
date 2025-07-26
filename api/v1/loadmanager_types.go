@@ -28,8 +28,29 @@ type LoadManagerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of LoadManager. Edit loadmanager_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// ChildCount определяет количество дочерних элементов.
+	// +kubebuilder:validation:Minimum=0
+	ChildCount int `json:"childCount,omitempty"`
+
+	// StatusUpdateTimeout задаёт таймаут обновления статуса в секундах.
+	// +kubebuilder:validation:Minimum=1
+	StatusUpdateTimeout int `json:"statusUpdateTimeout,omitempty"`
+
+	// PayloadSize задаёт размер полезной нагрузки в байтах.
+	// +kubebuilder:validation:Minimum=0
+	PayloadSize int `json:"payloadSize,omitempty"`
+
+	// UpdateFrequency задаёт частоту обновления в миллисекундах.
+	// +kubebuilder:validation:Minimum=1
+	UpdateFrequency int `json:"updateFrequency,omitempty"`
+
+	// Mode определяет режим работы.
+	// +kubebuilder:validation:Enum=auto;manual
+	Mode string `json:"mode,omitempty"`
+
+	// MaxConcurrent определяет максимальное количество одновременных операций.
+	// +kubebuilder:validation:Minimum=1
+	MaxConcurrent int `json:"maxConcurrent,omitempty"`
 }
 
 // LoadManagerStatus defines the observed state of LoadManager.
