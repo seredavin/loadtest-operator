@@ -267,6 +267,86 @@ var _ = Describe("Manager", Ordered, func() {
 		//    strings.ToLower(<Kind>),
 		// ))
 	})
+
+	Context("LoadWorker", func() {
+		It("should update status in auto mode", func() {
+			By("Creating LoadWorker in auto mode")
+			manifest := `
+apiVersion: loadtest.gitopscd.ru/v1
+kind: LoadWorker
+metadata:
+  name: e2e-auto-worker
+  namespace: ` + namespace + `
+spec:
+  mode: auto
+  childCount: 2
+  updateFrequency: 100
+  payloadSize: 8
+  maxConcurrent: 2
+  statusUpdateTimeout: 2
+`
+			file := filepath.Join(os.TempDir(), "e2e-auto-worker.yaml")
+			os.WriteFile(file, []byte(manifest), 0644)
+			cmd := exec.Command("kubectl", "apply", "-f", file)
+			_, err := utils.Run(cmd)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("Waiting for status update")
+			Eventually(func() string {
+				cmd := exec.Command("kubectl", "get", "loadworker", "e2e-auto-worker", "-n", namespace, "-o", "json")
+				out, err := utils.Run(cmd)
+				if err != nil {
+					return ""
+				}
+				var obj map[string]interface{}
+				_ = json.Unmarshal([]byte(out), &obj)
+				status, ok := obj["status"].(map[string]interface{})
+				if !ok {
+					return ""
+				}
+				return fmt.Sprintf("%v", status)
+			}).ShouldNot(BeEmpty())
+		})
+
+		It("should not update status in manual mode", func() {
+			By("Creating LoadWorker in manual mode")
+			manifest := `
+apiVersion: loadtest.gitopscd.ru/v1
+kind: LoadWorker
+metadata:
+  name: e2e-manual-worker
+  namespace: ` + namespace + `
+spec:
+  mode: manual
+  childCount: 2
+  updateFrequency: 100
+  payloadSize: 8
+  maxConcurrent: 2
+  statusUpdateTimeout: 2
+`
+			file := filepath.Join(os.TempDir(), "e2e-manual-worker.yaml")
+			os.WriteFile(file, []byte(manifest), 0644)
+			cmd := exec.Command("kubectl", "apply", "-f", file)
+			_, err := utils.Run(cmd)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("Checking that status is not updated")
+			Consistently(func() string {
+				cmd := exec.Command("kubectl", "get", "loadworker", "e2e-manual-worker", "-n", namespace, "-o", "json")
+				out, err := utils.Run(cmd)
+				if err != nil {
+					return "err"
+				}
+				var obj map[string]interface{}
+				_ = json.Unmarshal([]byte(out), &obj)
+				status, ok := obj["status"].(map[string]interface{})
+				if !ok {
+					return ""
+				}
+				return fmt.Sprintf("%v", status)
+			}, "10s", "2s").Should(BeEmpty())
+		})
+	})
 })
 
 // serviceAccountToken returns a token for the specified service account in the given namespace.

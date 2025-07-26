@@ -29,7 +29,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
 # gitopscd.ru/loadtest-operator-bundle:$VERSION and gitopscd.ru/loadtest-operator-catalog:$VERSION.
-IMAGE_TAG_BASE ?= gitopscd.ru/loadtest-operator
+IMAGE_TAG_BASE ?= docker.io/seredavin/loadtest-operator
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)

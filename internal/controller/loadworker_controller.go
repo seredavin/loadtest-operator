@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -47,11 +48,51 @@ type LoadWorkerReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
 func (r *LoadWorkerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
+	log := logf.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var worker loadtestv1.LoadWorker
+	if err := r.Get(ctx, req.NamespacedName, &worker); err != nil {
+		log.Error(err, "unable to fetch LoadWorker")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
-	return ctrl.Result{}, nil
+	spec := worker.Spec
+	if spec.Mode != "auto" {
+		return ctrl.Result{RequeueAfter: 0}, nil
+	}
+
+	// Генерируем payload нужного размера
+	payload := make([]byte, spec.PayloadSize)
+	for i := range payload {
+		payload[i] = byte('A' + i%26)
+	}
+
+	// Параллельное обновление статуса
+	tasks := spec.MaxConcurrent
+	if tasks < 1 {
+		tasks = 1
+	}
+	updateFreq := spec.UpdateFrequency
+	if updateFreq < 1 {
+		updateFreq = 1000
+	}
+
+	// Пример: обновим статус ChildCount раз с заданной частотой
+	for i := 0; i < spec.ChildCount; i++ {
+		go func(idx int) {
+			// Можно добавить поля в статус, например, PayloadHash или Progress
+			// status := worker.Status
+			// status.Progress = float32(idx+1) / float32(spec.ChildCount)
+			// status.PayloadHash = fmt.Sprintf("%x", sha256.Sum256(payload))
+			err := r.Status().Update(ctx, &worker)
+			if err != nil {
+				log.Error(err, "failed to update status")
+			}
+		}(i)
+		time.Sleep(time.Duration(updateFreq) * time.Millisecond)
+	}
+
+	return ctrl.Result{RequeueAfter: time.Duration(spec.StatusUpdateTimeout) * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

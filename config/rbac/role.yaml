@@ -8,6 +8,7 @@ rules:
   - loadtest.gitopscd.ru
   resources:
   - loadmanagers
+  - loadworkers
   verbs:
   - create
   - delete
@@ -20,12 +21,14 @@ rules:
   - loadtest.gitopscd.ru
   resources:
   - loadmanagers/finalizers
+  - loadworkers/finalizers
   verbs:
   - update
 - apiGroups:
   - loadtest.gitopscd.ru
   resources:
   - loadmanagers/status
+  - loadworkers/status
   verbs:
   - get
   - patch

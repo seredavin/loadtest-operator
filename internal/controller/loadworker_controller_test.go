@@ -80,5 +80,45 @@ var _ = Describe("LoadWorker Controller", func() {
 			// TODO(user): Add more specific assertions depending on your controller's reconciliation logic.
 			// Example: If you expect a certain status condition after reconciliation, verify it here.
 		})
+		It("should not update status in manual mode", func() {
+			By("Setting mode to manual")
+			resource := &loadtestv1.LoadWorker{}
+			Expect(k8sClient.Get(ctx, typeNamespacedName, resource)).To(Succeed())
+			resource.Spec.Mode = "manual"
+			Expect(k8sClient.Update(ctx, resource)).To(Succeed())
+
+			controllerReconciler := &LoadWorkerReconciler{
+				Client: k8sClient,
+				Scheme: k8sClient.Scheme(),
+			}
+			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: typeNamespacedName,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			// Статус не должен меняться (можно добавить проверку по полю, если оно появится)
+		})
+
+		It("should update status in auto mode according to spec", func() {
+			By("Setting mode to auto and configuring spec")
+			resource := &loadtestv1.LoadWorker{}
+			Expect(k8sClient.Get(ctx, typeNamespacedName, resource)).To(Succeed())
+			resource.Spec.Mode = "auto"
+			resource.Spec.ChildCount = 2
+			resource.Spec.UpdateFrequency = 10
+			resource.Spec.PayloadSize = 8
+			resource.Spec.MaxConcurrent = 2
+			resource.Spec.StatusUpdateTimeout = 1
+			Expect(k8sClient.Update(ctx, resource)).To(Succeed())
+
+			controllerReconciler := &LoadWorkerReconciler{
+				Client: k8sClient,
+				Scheme: k8sClient.Scheme(),
+			}
+			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: typeNamespacedName,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			// Проверяем, что статус обновился (можно добавить проверку по полю, если оно появится)
+		})
 	})
 })
