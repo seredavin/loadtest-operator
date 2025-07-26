@@ -16,7 +16,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nuk]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

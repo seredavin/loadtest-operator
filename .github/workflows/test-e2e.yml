@@ -6,8 +6,8 @@ on:
 
 jobs:
   test-e2e:
-    name: Run on Ubuntu
-    runs-on: ubuntu-latest
+    name: Run on nuk
+    runs-on: [self-hosted, nuk]
     steps:
       - name: Clone the code
         uses: actions/checkout@v4
