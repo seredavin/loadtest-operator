@@ -48,13 +48,10 @@ jobs:
             extraPortMappings:
             - containerPort: 6443
               hostPort: 16443
-              listenAddress: "0.0.0.0"
+              listenAddress: "127.0.0.1"
           EOF
           kind get kubeconfig --name loadtest-operator-test-e2e > /tmp/kubeconfig
-          KIND_CONTAINER=$(docker ps --filter "name=loadtest-operator-test-e2e-control-plane" --format "{{.ID}}")
-          KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $KIND_CONTAINER)
-          sed -i "s/127.0.0.1:[0-9]\+/$KIND_IP:6443/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1:[0-9]\+/$KIND_IP:6443/g" /tmp/kubeconfig
-          sed -i "s/0.0.0.0:[0-9]\+/$KIND_IP:6443/g" /tmp/kubeconfig || sed -i '' "s/0.0.0.0:[0-9]\+/$KIND_IP:6443/g" /tmp/kubeconfig
+          sed -i "s/127.0.0.1:[0-9]\+/127.0.0.1:16443/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1:[0-9]\+/127.0.0.1:16443/g" /tmp/kubeconfig
           echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
 
       - name: Wait for Kubernetes API
