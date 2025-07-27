@@ -51,7 +51,8 @@ jobs:
               listenAddress: "0.0.0.0"
           EOF
           kind get kubeconfig --name loadtest-operator-test-e2e > /tmp/kubeconfig
-          sed -i "s/127.0.0.1:.*$/127.0.0.1:16443/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1:.*$/127.0.0.1:16443/g" /tmp/kubeconfig
+          sed -i "s/0.0.0.0/127.0.0.1/g" /tmp/kubeconfig || sed -i '' "s/0.0.0.0/127.0.0.1/g" /tmp/kubeconfig
+          sed -i "s/127.0.0.1:[0-9]\+/127.0.0.1:16443/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1:[0-9]\+/127.0.0.1:16443/g" /tmp/kubeconfig
           echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
 
       - name: Wait for Kubernetes API
