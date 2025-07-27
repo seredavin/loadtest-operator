@@ -34,7 +34,14 @@ jobs:
           chmod +x $HOME/.local/bin/kubectl
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: Create kind cluster
+        run: |
+          kind create cluster --name loadtest-operator-test-e2e --wait 120s
+          echo "KUBECONFIG=$(kind get kubeconfig-path --name=loadtest-operator-test-e2e)" >> $GITHUB_ENV
+
       - name: Running Test e2e
+        env:
+          KUBECONFIG: ${{ env.KUBECONFIG }}
         run: |
           go mod tidy
           make test-e2e
