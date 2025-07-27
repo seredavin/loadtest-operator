@@ -43,6 +43,14 @@ jobs:
           kind create cluster --name loadtest-operator-test-e2e --wait 120s
           echo "KUBECONFIG=$(kind get kubeconfig-path --name=loadtest-operator-test-e2e)" >> $GITHUB_ENV
 
+      - name: Wait for Kubernetes API
+        run: |
+          for i in {1..60}; do
+            kubectl get nodes && break
+            echo "Waiting for API server... ($i/60)"
+            sleep 2
+          done
+
       - name: Running Test e2e
         env:
           KUBECONFIG: ${{ env.KUBECONFIG }}
