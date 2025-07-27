@@ -195,3 +195,4 @@ make undeploy
 - Namespace по умолчанию: `system`.
 - Для работы с kustomize используйте версию, совместимую с Kubernetes 1.22+.
 - Для e2e и unit тестов используйте `make test` и `make test-e2e`.
+
