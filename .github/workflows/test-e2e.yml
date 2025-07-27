@@ -40,11 +40,18 @@ jobs:
 
       - name: Create kind cluster
         run: |
-          kind create cluster --name loadtest-operator-test-e2e --wait 120s
+          cat <<EOF | kind create cluster --name loadtest-operator-test-e2e --config=- --wait 120s
+          kind: Cluster
+          apiVersion: kind.x-k8s.io/v1alpha4
+          nodes:
+          - role: control-plane
+            extraPortMappings:
+            - containerPort: 6443
+              hostPort: 16443
+              listenAddress: "0.0.0.0"
+          EOF
           kind get kubeconfig --name loadtest-operator-test-e2e > /tmp/kubeconfig
-          KIND_CONTAINER=$(docker ps --filter "name=loadtest-operator-test-e2e-control-plane" --format "{{.ID}}")
-          KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $KIND_CONTAINER)
-          sed -i "s/127.0.0.1/$KIND_IP/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1/$KIND_IP/g" /tmp/kubeconfig
+          sed -i "s/127.0.0.1:.*$/127.0.0.1:16443/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1:.*$/127.0.0.1:16443/g" /tmp/kubeconfig
           echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
 
       - name: Wait for Kubernetes API
