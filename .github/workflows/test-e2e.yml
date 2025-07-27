@@ -41,9 +41,13 @@ jobs:
       - name: Create kind cluster
         run: |
           kind create cluster --name loadtest-operator-test-e2e --wait 120s
-          echo "KUBECONFIG=$(kind get kubeconfig-path --name=loadtest-operator-test-e2e)" >> $GITHUB_ENV
+          kind get kubeconfig --name loadtest-operator-test-e2e > /tmp/kubeconfig
+          sed -i 's/127.0.0.1/host.docker.internal/g' /tmp/kubeconfig || sed -i '' 's/127.0.0.1/host.docker.internal/g' /tmp/kubeconfig
+          echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
 
       - name: Wait for Kubernetes API
+        env:
+          KUBECONFIG: ${{ env.KUBECONFIG }}
         run: |
           for i in {1..60}; do
             kubectl get nodes && break
