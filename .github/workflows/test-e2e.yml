@@ -34,6 +34,10 @@ jobs:
           chmod +x $HOME/.local/bin/kubectl
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: Delete kind cluster if exists
+        run: |
+          kind delete cluster --name loadtest-operator-test-e2e || true
+
       - name: Create kind cluster
         run: |
           kind create cluster --name loadtest-operator-test-e2e --wait 120s
