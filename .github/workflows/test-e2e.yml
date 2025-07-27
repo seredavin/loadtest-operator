@@ -42,8 +42,8 @@ jobs:
         run: |
           kind create cluster --name loadtest-operator-test-e2e --wait 120s
           kind get kubeconfig --name loadtest-operator-test-e2e > /tmp/kubeconfig
-          DOCKER0_IP=$(ip -4 addr show docker0 | grep -Po 'inet \\K[\\d.]+')
-          sed -i "s/127.0.0.1/$DOCKER0_IP/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1/$DOCKER0_IP/g" /tmp/kubeconfig
+          HOST_IP=$(ip route | awk '/default/ { print $3 }')
+          sed -i "s/127.0.0.1/$HOST_IP/g" /tmp/kubeconfig || sed -i '' "s/127.0.0.1/$HOST_IP/g" /tmp/kubeconfig
           echo "KUBECONFIG=/tmp/kubeconfig" >> $GITHUB_ENV
 
       - name: Wait for Kubernetes API
