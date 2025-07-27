@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    name: Run on nuk
+    name: Tests
     runs-on: self-hosted
     steps:
       - name: Clone the code
