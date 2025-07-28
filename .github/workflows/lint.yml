@@ -9,6 +9,11 @@ jobs:
     name: Lint Code
     runs-on: self-hosted
     steps:
+      - name: Show current user
+        run: |
+          whoami
+          id
+          ls -l /home/docker/actions-runner/_work/loadtest-operator/loadtest-operator/bin
       - name: Clone the code
         uses: actions/checkout@v4
 
