@@ -9,6 +9,10 @@ jobs:
     name: Lint Code
     runs-on: self-hosted
     steps:
+      - name: Fix permissions for bin
+        run: |
+          chmod -R u+w /home/docker/actions-runner/_work/loadtest-operator/loadtest-operator/bin || true
+
       - name: Show current user
         run: |
           whoami

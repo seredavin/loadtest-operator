@@ -19,6 +19,10 @@ jobs:
     name: Build and Push Docker Image
     runs-on: self-hosted
     steps:
+      - name: Fix permissions for bin
+        run: |
+          chmod -R u+w /home/docker/actions-runner/_work/loadtest-operator/loadtest-operator/bin || true
+
       - name: Checkout code
         uses: actions/checkout@v4
 
